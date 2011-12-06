@@ -24,3 +24,7 @@ The one thing to be aware of is that if your site ID is updated in the future,
 the old code will be hard-coded in the compiled templates, so you'll need
 to recompile the layout templates. The [Assetic app](http://github.com/jbroadway/assetic)
 has a handy button to do this in a single click.
+
+## Future
+
+* Integrate Analytics API to make stats visible from within the CMS
