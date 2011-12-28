@@ -1,0 +1,37 @@
+<script type="text/javascript" src="/js/jquery.verify_values.js"></script>
+<script type="text/javascript">
+$(function () {
+	$('#analytics-form').verify_values ({
+		handler: 'analytics/admin',
+		callback: function (failed) {
+			// highlight the failed elements
+			for (var i = 0; i < failed.length; i++) {
+				$('#' + failed[i] + '-notice').show ();
+			}
+		},
+		reset: function (fields) {
+			for (var i = 0; i < fields.length; i++) {
+				$('#' + fields[i] + '-notice').hide ();
+			}
+		}
+	});
+	{% foreach failed %}
+	$('#{{ loop_value }}-notice').show ();
+	{% end %}
+});
+</script>
+
+<form method="POST" id="analytics-form">
+
+<p>{" Google Analytics Profile "}:<br />
+<select name="profile">
+{% foreach sites %}
+	<option value="{{ loop_index }}"{% if profile == $data->loop_index %} selected {% end %}>{{ loop_value }}</option>
+{% end %}
+</select>
+<span class="notice" id="profile-notice">{" You must choose a Google Analytics profile. "}</span>
+</p>
+
+<p><input type="submit" value="{" Save Changes "}" /></p>
+
+</form>

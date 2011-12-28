@@ -1,0 +1,46 @@
+<script type="text/javascript" src="/js/jquery.verify_values.js"></script>
+<script type="text/javascript">
+$(function () {
+	$('#analytics-form').verify_values ({
+		handler: 'analytics/admin',
+		callback: function (failed) {
+			// highlight the failed elements
+			for (var i = 0; i < failed.length; i++) {
+				$('#' + failed[i] + '-notice').show ();
+			}
+		},
+		reset: function (fields) {
+			for (var i = 0; i < fields.length; i++) {
+				$('#' + fields[i] + '-notice').hide ();
+			}
+		}
+	});
+	{% foreach failed %}
+	$('#{{ loop_value }}-notice').show ();
+	{% end %}
+});
+</script>
+
+<form method="POST" id="analytics-form">
+<input type="hidden" name="profile" value="{{ profile }}" />
+
+<p><a href="http://www.google.com/support/analyticshelp/bin/answer.py?answer=1032385" target="_blank">{" Where can I find my Google Analytics site ID? "}</a></p>
+
+<p>{" Google Analytics Site ID "}:<br />
+<input type="text" name="site_id" size="20" value="{{ site_id }}" />
+<span class="notice" id="site_id-notice">{" You must enter your Google Analytics site ID. "}</span>
+</p>
+
+<p>{" Google Analytics Email "}:<br />
+<input type="text" name="email" size="20" value="{{ email }}" />
+<span class="notice" id="email-notice">{" You must enter your Google Analytics email address. "}</span>
+</p>
+
+<p>{" Google Analytics Password "}:<br />
+<input type="password" name="pass" size="20" value="{{ pass }}" />
+<span class="notice" id="pass-notice">{" You must enter your Google Analytics password. "}</span>
+</p>
+
+<p><input type="submit" value="{" Save Changes "}" /></p>
+
+</form>

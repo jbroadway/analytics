@@ -1,35 +1,73 @@
-<script type="text/javascript" src="/js/jquery.verify_values.js"></script>
-<script type="text/javascript">
-$(function () {
-	$('#analytics-form').verify_values ({
-		handler: 'analytics/admin',
-		callback: function (failed) {
-			// highlight the failed elements
-			for (var i = 0; i < failed.length; i++) {
-				$('#' + failed[i] + '-notice').show ();
-			}
-		},
-		reset: function (fields) {
-			for (var i = 0; i < fields.length; i++) {
-				$('#' + fields[i] + '-notice').hide ();
-			}
-		}
-	});
-	{% foreach failed %}
-	$('#{{ loop_value }}-notice').show ();
-	{% end %}
-});
-</script>
-
-<form method="POST" id="analytics-form">
-
-<p><a href="http://www.google.com/support/analyticshelp/bin/answer.py?answer=1032385" target="_blank">{" Where can I find my Google Analytics site ID? "}</a></p>
-
-<p>{" Google Analytics Site ID "}:<br />
-<input type="text" name="site_id" size="20" value="{{ site_id }}" />
-<span class="notice" id="site_id-notice">{" You must enter your Google Analytics site ID. "}</span>
+<p>
+	<a href="/analytics/settings">{" Update Settings "}</a>
+	&nbsp;|&nbsp;
+	<a href="http://www.google.com/analytics/web/" target="_blank">{" Visit Google Analytics "}</a>
 </p>
 
-<p><input type="submit" value="{" Save Changes "}" /></p>
+<h5>{" Overview: "}</h5>
 
-</form>
+<p><div id="visitors" style="width: 940px; height: 240px"></div></p>
+
+<h5>{" Totals "}:</h5>
+
+<ul>
+	<li><strong>{{ total_visits }}</strong> {" Visits "}</li>
+	<li><strong>{{ total_visitors }}</strong> {" Unique visitors "}</li>
+	<li><strong>{{ total_pageviews }}</strong> {" Page views "}</li>
+	<li><strong>{{ pages_per_visit }}</strong> {" Pages/visit "}</li>
+</ul>
+
+<!--[if lte IE 8]><script src="/apps/analytics/js/excanvas.min.js"></script><![endif]-->
+<script src="/apps/analytics/js/jquery.flot.js"></script>
+<script>
+$(function () {
+	$.plot (
+		$('#visitors'),
+		{{ data|json_encode }},
+		{
+			series: {
+				lines: { show: true },
+				points: { show: true }
+			},
+			xaxis: {{ x|json_encode }},
+			grid: {
+				backgroundColor: { colors: ['#fff', '#f5f5f5'] },
+				hoverable: true
+			}
+		}
+	);
+
+	function show_tooltip (x, y, contents) {
+		$('<div id="visitors-tooltip">' + contents + '</div>').css ({
+			position: 'absolute',
+			display: 'none',
+			top: y + 5,
+			left: x + 8,
+			border: '1px solid #ccc',
+			padding: '1px 5px 1px 5px',
+			backgroundColor: '#f5f5f5',
+			opacity: 0.9,
+			'-moz-border-radius': '2px',
+			'-webkit-border-radius': '2px',
+			'border-radius': '2px'
+		}).appendTo ('body').fadeIn (200);
+	}
+
+	var previous_point = null;
+	$('#visitors').bind ('plothover', function (event, pos, item) {
+		if (item) {
+			if (previous_point != item.dataIndex) {
+				previous_point = item.dataIndex;
+
+				$('#visitors-tooltip').remove ();
+
+				console.log (item);
+				show_tooltip (item.pageX, item.pageY, item.datapoint[1]);
+			}
+		} else {
+			$('#visitors-tooltip').remove ();
+			previous_point = null;
+		}
+	});
+});
+</script>
