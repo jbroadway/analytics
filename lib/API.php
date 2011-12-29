@@ -6,16 +6,27 @@ class API extends \Restful {
 	public $email;
 	public $pass;
 	public $profile;
+	public $token;
 	public $ga;
 	public $err;
 
+	/**
+	 * Constructor authenticates and generates an auth token.
+	 */
 	public function __construct () {
 		try {
 			$settings = parse_ini_file ('conf/analytics.php');
 			$this->email = $settings['email'];
 			$this->pass = $settings['pass'];
 			$this->profile = $settings['profile'];
-			$this->ga = new \gapi ($this->email, $this->pass);
+			$this->token = $_SESSION['ga_auth_token'] ? $_SESSION['ga_auth_token'] : null;
+
+			$this->ga = new \gapi ($this->email, $this->pass, $this->token);
+
+			if ($this->token === null) {
+				$this->token = $this->ga->getAuthToken ();
+				$_SESSION['ga_auth_token'] = $this->token;
+			}
 		} catch (Exception $e) {
 			$this->err = $e->getMessage ();
 		}
@@ -89,7 +100,8 @@ class API extends \Restful {
 				array ('-visits'), // sort
 				'', // filter
 				gmdate ('Y-m-d', $min),
-				gmdate ('Y-m-d') // today
+				gmdate ('Y-m-d'), // today
+				1, 10
 			);
 
 			$data = array ();
@@ -128,7 +140,8 @@ class API extends \Restful {
 				array ('-visits'), // sort
 				'', // filter
 				gmdate ('Y-m-d', $min),
-				gmdate ('Y-m-d') // today
+				gmdate ('Y-m-d'), // today
+				1, 10
 			);
 
 			$data = array ();
@@ -167,7 +180,8 @@ class API extends \Restful {
 				array ('-visits'), // sort
 				'', // filter
 				gmdate ('Y-m-d', $min),
-				gmdate ('Y-m-d') // today
+				gmdate ('Y-m-d'), // today
+				1, 10
 			);
 
 			$data = array ();
@@ -206,7 +220,8 @@ class API extends \Restful {
 				array ('-visits'), // sort
 				'', // filter
 				gmdate ('Y-m-d', $min),
-				gmdate ('Y-m-d') // today
+				gmdate ('Y-m-d'), // today
+				1, 10
 			);
 
 			$data = array ();
@@ -214,6 +229,86 @@ class API extends \Restful {
 			foreach ($this->ga->getResults () as $k => $res) {
 				$data[] = array (
 					'country' => $res->getCountry (),
+					'visits' => $res->getVisits ()
+				);
+			}
+
+			return $data;
+		} catch (Exception $e) {
+			return $this->error ($e->getMessage ());
+		}
+	}
+
+	/**
+	 * Get the top pages on the site. Accessed via:
+	 *
+	 *   /analytics/api/toppages
+	 */
+	public function get_toppages () {
+		if ($this->error) {
+			// failed to connect
+			return $this->error ($this->err);
+		}
+
+		try {
+			$min = time () - 2592000; // 30 days ago
+	
+			$this->ga->requestReportData (
+				$this->profile,
+				array ('pagePath'),
+				array ('visits'),
+				array ('-visits'), // sort
+				'', // filter
+				gmdate ('Y-m-d', $min),
+				gmdate ('Y-m-d'), // today
+				1, 10
+			);
+
+			$data = array ();
+
+			foreach ($this->ga->getResults () as $k => $res) {
+				$data[] = array (
+					'page' => $res->getPagePath (),
+					'visits' => $res->getVisits ()
+				);
+			}
+
+			return $data;
+		} catch (Exception $e) {
+			return $this->error ($e->getMessage ());
+		}
+	}
+
+	/**
+	 * Get the top browsers used on the site. Accessed via:
+	 *
+	 *   /analytics/api/browsers
+	 */
+	public function get_browsers () {
+		if ($this->error) {
+			// failed to connect
+			return $this->error ($this->err);
+		}
+
+		try {
+			$min = time () - 2592000; // 30 days ago
+	
+			$this->ga->requestReportData (
+				$this->profile,
+				array ('browser'),
+				array ('visits'),
+				array ('-visits'), // sort
+				'', // filter
+				gmdate ('Y-m-d', $min),
+				gmdate ('Y-m-d'), // today
+				1, 10
+			);
+
+			$data = array ();
+
+			foreach ($this->ga->getResults () as $k => $res) {
+				$data[] = array (
+					'browser' => $res->getBrowser (),
 					'visits' => $res->getVisits ()
 				);
 			}

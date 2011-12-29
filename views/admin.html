@@ -1,3 +1,8 @@
+<style>
+ul, li { list-style-type: none; margin-left: 0; padding-left: 0; }
+li strong { clear: both; display: block; float: left; width: 45px; text-align: right; padding-right: 10px; }
+</style>
+
 <p>
 	<a href="/analytics/settings">{" Update Settings "}</a>
 	&nbsp;|&nbsp;
@@ -11,6 +16,7 @@
 	{"Loading data from Google Analytics..."}
 </div></p>
 
+<div class="grid_4 alpha">
 <h5>{" Totals "}:</h5>
 
 <ul>
@@ -20,6 +26,51 @@
 	<li><strong id="pages_per_visit">0</strong> {" Pages/visit "}</li>
 	<li><strong id="avg_time_on_site">0:00</strong> {" Avg. time on site "}</li>
 </ul>
+</div>
+
+<div class="grid_4">
+<h5>{" Landing Pages "}</h5>
+
+<ul id="landingpages">
+	<li>{"Loading..."}</li>
+</ul>
+</div>
+
+<div class="grid_4 omega">
+<h5>{" Referral Sites "}</h5>
+
+<ul id="sources">
+	<li>{"Loading..."}</li>
+</ul>
+</div>
+
+<div class="clear"></div>
+
+<div class="grid_4 alpha">
+<h5>{" Search Terms "}</h5>
+
+<ul id="keywords">
+	<li>{"Loading..."}</li>
+</ul>
+</div>
+
+<div class="grid_4">
+<h5>{" Countries "}</h5>
+
+<ul id="countries">
+	<li>{"Loading..."}</li>
+</ul>
+</div>
+
+<div class="grid_4 omega">
+<h5>{" Browsers "}</h5>
+
+<ul id="browsers">
+	<li>{"Loading..."}</li>
+</ul>
+</div>
+
+<div class="clear"></div>
 
 <!--[if lte IE 8]><script src="/apps/analytics/js/excanvas.min.js"></script><![endif]-->
 <script src="/apps/analytics/js/jquery.flot.js"></script>
@@ -41,6 +92,13 @@ $(function () {
 			'-webkit-border-radius': '2px',
 			'border-radius': '2px'
 		}).appendTo ('body').fadeIn (200);
+	};
+
+	$.a_dotdotdot = function (str, limit) {
+		if (str.length <= limit) {
+			return str;
+		}
+		return str.substr (0, limit - 3) + '...';
 	};
 
 	$.get ('/analytics/api/visitors', function (res) {
@@ -87,8 +145,78 @@ $(function () {
 		});
 	});
 
+	$.get ('/analytics/api/landingpages', function (res) {
+		if (! res.success) {
+			$('#landingpages li').html ('{"Failed to load results."}');
+			return false;
+		}
+
+		var ul = $('#landingpages'),
+			list = '';
+		for (var i = 0; i < res.data.length; i++) {
+			list += '<li><strong>' + res.data[i].visits + '</strong> <a href="' + res.data[i].page + '" target="_blank">' + $.a_dotdotdot (res.data[i].page, 40) + '</a></li>';
+		}
+		ul.html (list);
+	});
+
 	$.get ('/analytics/api/sources', function (res) {
-		console.log (res);
+		if (! res.success) {
+			$('#sources li').html ('{"Failed to load results."}');
+			return false;
+		}
+
+		var ul = $('#sources'),
+			list = '';
+		for (var i = 0; i < res.data.length; i++) {
+			if (res.data[i].source !== '(direct)') {
+				list += '<li><strong>' + res.data[i].visits + '</strong> <a href="http://' + res.data[i].source + '/" target="_blank">' + $.a_dotdotdot (res.data[i].source, 40) + '</a></li>';
+			} else {
+				list += '<li><strong>' + res.data[i].visits + '</strong> ' + $.a_dotdotdot (res.data[i].source, 40) + '</li>';
+			}
+		}
+		ul.html (list);
+	});
+
+	$.get ('/analytics/api/keywords', function (res) {
+		if (! res.success) {
+			$('#keywords li').html ('{"Failed to load results."}');
+			return false;
+		}
+
+		var ul = $('#keywords'),
+			list = '';
+		for (var i = 0; i < res.data.length; i++) {
+			list += '<li><strong>' + res.data[i].visits + '</strong> <span title="' + res.data[i].keyword + '">' + $.a_dotdotdot (res.data[i].keyword, 40) + '<span></li>';
+		}
+		ul.html (list);
+	});
+
+	$.get ('/analytics/api/countries', function (res) {
+		if (! res.success) {
+			$('#countries li').html ('{"Failed to load results."}');
+			return false;
+		}
+
+		var ul = $('#countries'),
+			list = '';
+		for (var i = 0; i < res.data.length; i++) {
+			list += '<li><strong>' + res.data[i].visits + '</strong> ' + res.data[i].country + '</li>';
+		}
+		ul.html (list);
+	});
+
+	$.get ('/analytics/api/browsers', function (res) {
+		if (! res.success) {
+			$('#browsers li').html ('{"Failed to load results."}');
+			return false;
+		}
+
+		var ul = $('#browsers'),
+			list = '';
+		for (var i = 0; i < res.data.length; i++) {
+			list += '<li><strong>' + res.data[i].visits + '</strong> ' + res.data[i].browser + '</li>';
+		}
+		ul.html (list);
 	});
 });
 </script>
