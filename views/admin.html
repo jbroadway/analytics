@@ -6,38 +6,28 @@
 
 <h5>{" Overview: "}</h5>
 
-<p><div id="visitors" style="width: 940px; height: 240px"></div></p>
+<p><div id="visitors" style="width: 940px; height: 240px">
+	<img src="/apps/analytics/pix/loading.gif" alt="" />
+	{"Loading data from Google Analytics..."}
+</div></p>
 
 <h5>{" Totals "}:</h5>
 
 <ul>
-	<li><strong>{{ total_visits }}</strong> {" Visits "}</li>
-	<li><strong>{{ total_visitors }}</strong> {" Unique visitors "}</li>
-	<li><strong>{{ total_pageviews }}</strong> {" Page views "}</li>
-	<li><strong>{{ pages_per_visit }}</strong> {" Pages/visit "}</li>
+	<li><strong id="total_visits">0</strong> {" Visits "}</li>
+	<li><strong id="total_visitors">0</strong> {" Unique visitors "}</li>
+	<li><strong id="total_pageviews">0</strong> {" Page views "}</li>
+	<li><strong id="pages_per_visit">0</strong> {" Pages/visit "}</li>
+	<li><strong id="avg_time_on_site">0:00</strong> {" Avg. time on site "}</li>
 </ul>
 
 <!--[if lte IE 8]><script src="/apps/analytics/js/excanvas.min.js"></script><![endif]-->
 <script src="/apps/analytics/js/jquery.flot.js"></script>
 <script>
 $(function () {
-	$.plot (
-		$('#visitors'),
-		{{ data|json_encode }},
-		{
-			series: {
-				lines: { show: true },
-				points: { show: true }
-			},
-			xaxis: {{ x|json_encode }},
-			grid: {
-				backgroundColor: { colors: ['#fff', '#f5f5f5'] },
-				hoverable: true
-			}
-		}
-	);
+	$.a_previous_point = null;
 
-	function show_tooltip (x, y, contents) {
+	$.a_show_tooltip = function (x, y, contents) {
 		$('<div id="visitors-tooltip">' + contents + '</div>').css ({
 			position: 'absolute',
 			display: 'none',
@@ -51,23 +41,54 @@ $(function () {
 			'-webkit-border-radius': '2px',
 			'border-radius': '2px'
 		}).appendTo ('body').fadeIn (200);
-	}
+	};
 
-	var previous_point = null;
-	$('#visitors').bind ('plothover', function (event, pos, item) {
-		if (item) {
-			if (previous_point != item.dataIndex) {
-				previous_point = item.dataIndex;
-
-				$('#visitors-tooltip').remove ();
-
-				console.log (item);
-				show_tooltip (item.pageX, item.pageY, item.datapoint[1]);
-			}
-		} else {
-			$('#visitors-tooltip').remove ();
-			previous_point = null;
+	$.get ('/analytics/api/visitors', function (res) {
+		if (! res.success) {
+			$('#visitors').html ('{"Failed to retrieve results"}: ' + res.error);
+			return false;
 		}
+
+		$.plot (
+			$('#visitors'),
+			res.data.data,
+			{
+				series: {
+					lines: { show: true },
+					points: { show: true }
+				},
+				xaxis: {{ x|json_encode }},
+				grid: {
+					backgroundColor: { colors: ['#fff', '#f5f5f5'] },
+					hoverable: true
+				}
+			}
+		);
+
+		$('#total_visits').text (res.data.visits);
+		$('#total_visitors').text (res.data.visitors);
+		$('#total_pageviews').text (res.data.pageviews);
+		$('#avg_time_on_site').text (res.data.avgtimeonsite);
+		$('#pages_per_visit').text (res.data.pagespervisit);
+
+		$('#visitors').bind ('plothover', function (event, pos, item) {
+			if (item) {
+				if ($.a_previous_point != item.dataIndex) {
+					$.a_previous_point = item.dataIndex;
+	
+					$('#visitors-tooltip').remove ();
+	
+					$.a_show_tooltip (item.pageX, item.pageY, item.datapoint[1]);
+				}
+			} else {
+				$('#visitors-tooltip').remove ();
+				$.a_previous_point = null;
+			}
+		});
+	});
+
+	$.get ('/analytics/api/sources', function (res) {
+		console.log (res);
 	});
 });
 </script>
