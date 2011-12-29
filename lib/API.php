@@ -11,9 +11,9 @@ class API extends \Restful {
 	public $err;
 
 	/**
-	 * Constructor authenticates and generates an auth token.
+	 * Authenticates and generates an auth token.
 	 */
-	public function __construct () {
+	public function init () {
 		try {
 			$settings = parse_ini_file ('conf/analytics.php');
 			$this->email = $settings['email'];
@@ -27,8 +27,10 @@ class API extends \Restful {
 				$this->token = $this->ga->getAuthToken ();
 				$_SESSION['ga_auth_token'] = $this->token;
 			}
+			return true;
 		} catch (Exception $e) {
 			$this->err = $e->getMessage ();
+			return false;
 		}
 	}
 
@@ -38,7 +40,14 @@ class API extends \Restful {
 	 *   /analytics/api/visitors
 	 */
 	public function get_visitors () {
-		if ($this->error) {
+		global $memcache;
+
+		$res = $memcache->get ('analytics_visitors');
+		if ($res) {
+			return $res;
+		}
+
+		if (! $this->init ()) {
 			// failed to connect
 			return $this->error ($this->err);
 		}
@@ -66,7 +75,7 @@ class API extends \Restful {
 				$data[1]->data[] = array ($k, $res->getVisits ());
 			}
 
-			return array (
+			$res = array (
 				'data' => $data,
 				'visitors' => $this->ga->getVisitors (),
 				'visits' => $this->ga->getVisits (),
@@ -74,6 +83,8 @@ class API extends \Restful {
 				'pagespervisit' => round ($this->ga->getPageviews () / $this->ga->getVisits (), 2),
 				'avgtimeonsite' => floor ($this->ga->getAvgTimeOnSite () / 60) . ':' . ($this->ga->getAvgTimeOnSite () % 60)
 			);
+			$memcache->set ('analytics_visitors', $res, 43200);
+			return $res;
 		} catch (Exception $e) {
 			return $this->error ($e->getMessage ());
 		}
@@ -85,7 +96,14 @@ class API extends \Restful {
 	 *   /analytics/api/sources
 	 */
 	public function get_sources () {
-		if ($this->error) {
+		global $memcache;
+
+		$res = $memcache->get ('analytics_sources');
+		if ($res) {
+			return $res;
+		}
+
+		if (! $this->init ()) {
 			// failed to connect
 			return $this->error ($this->err);
 		}
@@ -113,6 +131,7 @@ class API extends \Restful {
 				);
 			}
 
+			$memcache->set ('analytics_sources', $data, 43200);
 			return $data;
 		} catch (Exception $e) {
 			return $this->error ($e->getMessage ());
@@ -125,7 +144,14 @@ class API extends \Restful {
 	 *   /analytics/api/keywords
 	 */
 	public function get_keywords () {
-		if ($this->error) {
+		global $memcache;
+
+		$res = $memcache->get ('analytics_keywords');
+		if ($res) {
+			return $res;
+		}
+
+		if (! $this->init ()) {
 			// failed to connect
 			return $this->error ($this->err);
 		}
@@ -153,6 +179,7 @@ class API extends \Restful {
 				);
 			}
 
+			$memcache->set ('analytics_keywords', $data, 43200);
 			return $data;
 		} catch (Exception $e) {
 			return $this->error ($e->getMessage ());
@@ -165,7 +192,14 @@ class API extends \Restful {
 	 *   /analytics/api/landingpages
 	 */
 	public function get_landingpages () {
-		if ($this->error) {
+		global $memcache;
+
+		$res = $memcache->get ('analytics_landingpages');
+		if ($res) {
+			return $res;
+		}
+
+		if (! $this->init ()) {
 			// failed to connect
 			return $this->error ($this->err);
 		}
@@ -193,6 +227,7 @@ class API extends \Restful {
 				);
 			}
 
+			$memcache->set ('analytics_landingpages', $data, 43200);
 			return $data;
 		} catch (Exception $e) {
 			return $this->error ($e->getMessage ());
@@ -205,7 +240,14 @@ class API extends \Restful {
 	 *   /analytics/api/countries
 	 */
 	public function get_countries () {
-		if ($this->error) {
+		global $memcache;
+
+		$res = $memcache->get ('analytics_countries');
+		if ($res) {
+			return $res;
+		}
+
+		if (! $this->init ()) {
 			// failed to connect
 			return $this->error ($this->err);
 		}
@@ -233,6 +275,7 @@ class API extends \Restful {
 				);
 			}
 
+			$memcache->set ('analytics_countries', $data, 43200);
 			return $data;
 		} catch (Exception $e) {
 			return $this->error ($e->getMessage ());
@@ -245,7 +288,14 @@ class API extends \Restful {
 	 *   /analytics/api/toppages
 	 */
 	public function get_toppages () {
-		if ($this->error) {
+		global $memcache;
+
+		$res = $memcache->get ('analytics_toppages');
+		if ($res) {
+			return $res;
+		}
+
+		if (! $this->init ()) {
 			// failed to connect
 			return $this->error ($this->err);
 		}
@@ -273,6 +323,7 @@ class API extends \Restful {
 				);
 			}
 
+			$memcache->set ('analytics_toppages', $data, 43200);
 			return $data;
 		} catch (Exception $e) {
 			return $this->error ($e->getMessage ());
@@ -285,7 +336,14 @@ class API extends \Restful {
 	 *   /analytics/api/browsers
 	 */
 	public function get_browsers () {
-		if ($this->error) {
+		global $memcache;
+
+		$res = $memcache->get ('analytics_browsers');
+		if ($res) {
+			return $res;
+		}
+
+		if (! $this->init ()) {
 			// failed to connect
 			return $this->error ($this->err);
 		}
@@ -313,6 +371,7 @@ class API extends \Restful {
 				);
 			}
 
+			$memcache->set ('analytics_browsers', $data, 43200);
 			return $data;
 		} catch (Exception $e) {
 			return $this->error ($e->getMessage ());
