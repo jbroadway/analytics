@@ -18,9 +18,9 @@ if (! @file_exists ('conf/analytics.php')) {
 
 $settings = parse_ini_file ('conf/analytics.php');
 
-$ga = new gapi ($settings['email'], $settings['pass']);
-
 try {
+	$ga = new gapi ($settings['email'], $settings['pass']);
+
 	$data = array (
 		(object) array ('label' => i18n_get ('Page views'), 'data' => array ()),
 		(object) array ('label' => i18n_get ('Visits'), 'data' => array ()),
@@ -65,8 +65,9 @@ try {
 		'pages_per_visit' => round ($ga->getPageviews () / $ga->getVisits (), 2)
 	));
 } catch (Exception $e) {
-	echo '<p><strong>Failed to retrieve results. Error info:</strong></p>';
+	echo '<p><strong>' . i18n_get ('Failed to retrieve results. Error info:') . '</strong></p>';
 	echo '<p>' . $e->getMessage () . '</p>';
+	echo '<p><a href="/analytics/settings">' . i18n_get ('Update your settings') . '</a></p>';
 }
 
 ?>

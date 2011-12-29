@@ -32,19 +32,25 @@ if (! file_exists ('conf/analytics.php')) {
 $settings = parse_ini_file ('conf/analytics.php');
 
 // get the list of sites
-$ga = new gapi ($settings['email'], $settings['pass']);
-$ga->requestAccountData ();
-$sites = array ();
-foreach ($ga->getResults () as $result) {
-	$sites[$result->getProfileId ()] = $result->getTitle ();
+try {
+	$ga = new gapi ($settings['email'], $settings['pass']);
+	$ga->requestAccountData ();
+	$sites = array ();
+	foreach ($ga->getResults () as $result) {
+		$sites[$result->getProfileId ()] = $result->getTitle ();
+	}
+
+	$o = new StdClass;
+	$o->profile = $settings['profile'];
+	$o = $f->merge_values ($o);
+	$o->sites = $sites;
+	$o->failed = $f->failed;
+
+	echo $tpl->render ('analytics/account', $o);
+} catch (Exception $e) {
+	echo '<p><strong>' . i18n_get ('Failed to retrieve profile list. Error info:') . '</strong></p>';
+	echo '<p>' . $e->getMessage () . '</p>';
+	echo '<p><a href="/analytics/settings">' . i18n_get ('Update your settings') . '</a></p>';
 }
-
-$o = new StdClass;
-$o->profile = $settings['profile'];
-$o = $f->merge_values ($o);
-$o->sites = $sites;
-$o->failed = $f->failed;
-
-echo $tpl->render ('analytics/account', $o);
 
 ?>
