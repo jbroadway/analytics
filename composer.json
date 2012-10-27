@@ -4,6 +4,7 @@
     "description": "Google Analytics app for the Elefant CMS",
     "keywords": ["analytics", "stats", "traffic", "google", "elefant", "cms", "app"],
     "license": "MIT",
+    "version": "1.0",
 	"authors": [
 		{
 			"name": "Johnny Broadway",
