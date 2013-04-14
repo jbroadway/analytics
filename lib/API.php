@@ -40,9 +40,9 @@ class API extends \Restful {
 	 *   /analytics/api/visitors
 	 */
 	public function get_visitors () {
-		global $memcache;
+		global $cache;
 
-		$res = $memcache->get ('analytics_visitors');
+		$res = $cache->get ('analytics_visitors');
 		if ($res) {
 			return $res;
 		}
@@ -83,7 +83,7 @@ class API extends \Restful {
 				'pagespervisit' => round ($this->ga->getPageviews () / $this->ga->getVisits (), 2),
 				'avgtimeonsite' => floor ($this->ga->getAvgTimeOnSite () / 60) . ':' . ($this->ga->getAvgTimeOnSite () % 60)
 			);
-			$memcache->set ('analytics_visitors', $res, 43200);
+			$cache->set ('analytics_visitors', $res, 43200);
 			return $res;
 		} catch (Exception $e) {
 			return $this->error ($e->getMessage ());
@@ -96,9 +96,9 @@ class API extends \Restful {
 	 *   /analytics/api/sources
 	 */
 	public function get_sources () {
-		global $memcache;
+		global $cache;
 
-		$res = $memcache->get ('analytics_sources');
+		$res = $cache->get ('analytics_sources');
 		if ($res) {
 			return $res;
 		}
@@ -131,7 +131,7 @@ class API extends \Restful {
 				);
 			}
 
-			$memcache->set ('analytics_sources', $data, 43200);
+			$cache->set ('analytics_sources', $data, 43200);
 			return $data;
 		} catch (Exception $e) {
 			return $this->error ($e->getMessage ());
@@ -144,9 +144,9 @@ class API extends \Restful {
 	 *   /analytics/api/keywords
 	 */
 	public function get_keywords () {
-		global $memcache;
+		global $cache;
 
-		$res = $memcache->get ('analytics_keywords');
+		$res = $cache->get ('analytics_keywords');
 		if ($res) {
 			return $res;
 		}
@@ -179,7 +179,7 @@ class API extends \Restful {
 				);
 			}
 
-			$memcache->set ('analytics_keywords', $data, 43200);
+			$cache->set ('analytics_keywords', $data, 43200);
 			return $data;
 		} catch (Exception $e) {
 			return $this->error ($e->getMessage ());
@@ -192,9 +192,9 @@ class API extends \Restful {
 	 *   /analytics/api/landingpages
 	 */
 	public function get_landingpages () {
-		global $memcache;
+		global $cache;
 
-		$res = $memcache->get ('analytics_landingpages');
+		$res = $cache->get ('analytics_landingpages');
 		if ($res) {
 			return $res;
 		}
@@ -227,7 +227,7 @@ class API extends \Restful {
 				);
 			}
 
-			$memcache->set ('analytics_landingpages', $data, 43200);
+			$cache->set ('analytics_landingpages', $data, 43200);
 			return $data;
 		} catch (Exception $e) {
 			return $this->error ($e->getMessage ());
@@ -240,9 +240,9 @@ class API extends \Restful {
 	 *   /analytics/api/countries
 	 */
 	public function get_countries () {
-		global $memcache;
+		global $cache;
 
-		$res = $memcache->get ('analytics_countries');
+		$res = $cache->get ('analytics_countries');
 		if ($res) {
 			return $res;
 		}
@@ -275,7 +275,7 @@ class API extends \Restful {
 				);
 			}
 
-			$memcache->set ('analytics_countries', $data, 43200);
+			$cache->set ('analytics_countries', $data, 43200);
 			return $data;
 		} catch (Exception $e) {
 			return $this->error ($e->getMessage ());
@@ -288,9 +288,9 @@ class API extends \Restful {
 	 *   /analytics/api/toppages
 	 */
 	public function get_toppages () {
-		global $memcache;
+		global $cache;
 
-		$res = $memcache->get ('analytics_toppages');
+		$res = $cache->get ('analytics_toppages');
 		if ($res) {
 			return $res;
 		}
@@ -323,7 +323,7 @@ class API extends \Restful {
 				);
 			}
 
-			$memcache->set ('analytics_toppages', $data, 43200);
+			$cache->set ('analytics_toppages', $data, 43200);
 			return $data;
 		} catch (Exception $e) {
 			return $this->error ($e->getMessage ());
@@ -336,9 +336,9 @@ class API extends \Restful {
 	 *   /analytics/api/browsers
 	 */
 	public function get_browsers () {
-		global $memcache;
+		global $cache;
 
-		$res = $memcache->get ('analytics_browsers');
+		$res = $cache->get ('analytics_browsers');
 		if ($res) {
 			return $res;
 		}
@@ -371,7 +371,7 @@ class API extends \Restful {
 				);
 			}
 
-			$memcache->set ('analytics_browsers', $data, 43200);
+			$cache->set ('analytics_browsers', $data, 43200);
 			return $data;
 		} catch (Exception $e) {
 			return $this->error ($e->getMessage ());
