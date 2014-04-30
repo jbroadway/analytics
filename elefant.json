@@ -2,7 +2,7 @@
     "type":         "app",
     "folder":       "analytics",
     "name":         "Analytics",
-    "version":      "0.9.0",
+    "version":      "1.0.1",
     "website":      "http://www.elefantcms.com/",
     "repository":   "git://github.com/jbroadway/analytics.git",
     "author": {
