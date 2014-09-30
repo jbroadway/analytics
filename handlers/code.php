@@ -10,7 +10,7 @@
  *     {# analytics/code #}
  */
 
-$settings = parse_ini_file ('conf/analytics.php');
+$settings = parse_ini_file ('conf/app.analytics.' . ELEFANT_ENV . '.php');
 echo $tpl->render ('analytics/code', $settings);
 
 ?>

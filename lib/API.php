@@ -15,7 +15,7 @@ class API extends \Restful {
 	 */
 	public function init () {
 		try {
-			$settings = parse_ini_file ('conf/analytics.php');
+			$settings = parse_ini_file ('conf/app.analytics.' . ELEFANT_ENV . '.php');
 			$this->email = $settings['email'];
 			$this->pass = $settings['pass'];
 			$this->profile = $settings['profile'];

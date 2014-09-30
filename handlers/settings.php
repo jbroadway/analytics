@@ -14,7 +14,7 @@ $f = new Form ('post', 'analytics/admin');
 
 if ($f->submit ()) {
 	$_POST['open'] = '<?php';
-	if (file_put_contents ('conf/analytics.php', $tpl->render ('analytics/conf', $_POST))) {
+	if (file_put_contents ('conf/app.analytics.' . ELEFANT_ENV . '.php', $tpl->render ('analytics/conf', $_POST))) {
 		$this->add_notification (i18n_get ('Settings updated.'));
 		$this->redirect ('/analytics/account');
 	} else {
@@ -23,8 +23,8 @@ if ($f->submit ()) {
 }
 
 $o = new StdClass;
-if (file_exists ('conf/analytics.php')) {
-	$settings = parse_ini_file ('conf/analytics.php');
+if (file_exists ('conf/app.analytics.' . ELEFANT_ENV . '.php')) {
+	$settings = parse_ini_file ('conf/app.analytics.' . ELEFANT_ENV . '.php');
 	$o->site_id = $settings['site_id'];
 	$o->email = $settings['email'];
 	$o->pass = $settings['pass'];

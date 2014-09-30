@@ -10,7 +10,7 @@ $this->require_admin ();
 $page->title = 'Analytics';
 $page->layout = 'admin';
 
-if (! @file_exists ('conf/analytics.php')) {
+if (! @file_exists ('conf/app.analytics.' . ELEFANT_ENV . '.php')) {
 	$this->redirect ('/analytics/settings');
 }
 
